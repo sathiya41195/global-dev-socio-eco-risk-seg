@@ -5,3 +5,4 @@ mysql-connector-python
 plotly
 statsmodels
 pymysql
+matplotlib
