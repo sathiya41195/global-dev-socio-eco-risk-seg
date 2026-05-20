@@ -1,7 +1,7 @@
-streamlit
-pandas
+streamlit>=1.57.0
+pandas>=3.0.3
+sqlalchemy
 mysql-connector-python
 plotly
 statsmodels
 pymysql
-sqlalchemy
