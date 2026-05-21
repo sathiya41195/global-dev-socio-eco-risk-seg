@@ -81,7 +81,7 @@ with tab1:
                 csv_path = (current_dir / '..' / 'source_data' / 'Country_data.csv').resolve()
                 raw_data = pd.read_csv(csv_path)
                 
-                # Outlier capping logic
+                # Outlier logic - Applied IQR majority of the data's look like skewed
                 for col in ["income", "gdpp", "child_mort", "inflation"]:
                     q25, q75 = raw_data[col].quantile(0.25), raw_data[col].quantile(0.75)
                     iqr = q75 - q25
@@ -98,14 +98,13 @@ with tab1:
                 ]
                 choices = ['High Risk Country', 'Developed Nation', 'Emerging Economy', 'High Inflation Risk', 'Health Critical', 'Low GDP Trap']
                 raw_data['segment'] = np.select(conditions, choices, default='Other')
-                
-                # Derived metrics calculations
+                upload_to_mysql(raw_data, 'country_data')                
+                #Feature engineering
                 raw_data['Development_Index'] = (raw_data['income'] + raw_data['gdpp'] + raw_data['life_expec']) / raw_data['child_mort']
                 raw_data['Trade_Balance'] = raw_data['exports'] - raw_data['imports']
                 raw_data['Health_Impact_Ratio'] = raw_data['health'] / raw_data['child_mort']
-                raw_data['Risk_flag'] = raw_data['segment'].isin(['High Risk Country', 'High Inflation Risk', 'Health Critical', 'Low GDP Trap']).astype(int)
+                raw_data['Risk_flag'] = raw_data['segment'].isin(['High Risk Country', 'High Inflation Risk', 'Health Critical', 'Low GDP Trap']).astype(int)                
                 
-                upload_to_mysql(raw_data, 'country_data')
                 st.success("Database successfully synchronized!")
                 st.rerun()
             except Exception as e:
@@ -156,7 +155,7 @@ with tab1:
         # Dynamic KPI Card Elements
         st.markdown("---")
         m1, m2, m3, m4 = st.columns(4)
-        m1.metric("Avg Income Pool", f"${df_filtered['income'].mean():,.2f}", border=True)
+        m1.metric("Avg Income Pool", f"${df_filtered['income'].mean()/1000:,.2f}k", border=True)
         m2.metric("Avg Life Expectancy", f"{df_filtered['life_expec'].mean():.1f} Yrs", border=True)
         m3.metric("Avg Child Mortality", f"{df_filtered['child_mort'].mean():.1f}", border=True)
         m4.metric("Active High-Risk Count", int(df_filtered['Risk_flag'].sum()), border=True)
