@@ -170,14 +170,20 @@ with tab2:
     st.subheader("Micro-Health Framework Metrics")
     if not df_filtered.empty:
         # Avoid chart crowding by showing top 20 vulnerability zones
-        df_sorted_mort = df_filtered.sort_values(by='child_mort', ascending=False).head(25)
-        st.plotly_chart(px.bar(df_sorted_mort, x='country', y='child_mort', color='segment', title='Child Mortality Performance Rankings (Top 25 Risk Zones)'), use_container_width=True)
+        df_sorted_mort = df_filtered.sort_values(by='child_mort', ascending=False)    
+        df_sorted_mort['rank_type'] = 'Other'
+        df_sorted_mort.iloc[:10, df_sorted_mort.columns.get_loc('rank_type')] = 'Top 10'
+        df_sorted_mort.iloc[-10:, df_sorted_mort.columns.get_loc('rank_type')] = 'Bottom 10'
+        st.plotly_chart(px.bar(df_sorted_mort, x='country', y='child_mort', color='rank_type', title='Child Mortality Performance Rankings'), use_container_width=True)
         
         st.plotly_chart(px.scatter(df_filtered, x='health', y='child_mort', color='segment', trendline="ols", title='Healthcare Infrastructure Capital Input Effectiveness vs Mortality Rates'), use_container_width=True)
         
         # Cleaned up inflation plot
-        df_sorted_inf = df_filtered.sort_values(by='inflation', ascending=False).head(25)
-        st.plotly_chart(px.bar(df_sorted_inf, x='country', y='inflation', color='segment', title='Macroeconomic Volatility Spikes (Top 25 Inflation Outliers)'), use_container_width=True)
+        df_sorted_inf = df_filtered.sort_values(by='inflation', ascending=False)
+        df_sorted_inf['rank_type'] = 'Other'
+        df_sorted_inf.iloc[:10, df_sorted_inf.columns.get_loc('rank_type')] = 'Top 10'
+        df_sorted_inf.iloc[-10:, df_sorted_inf.columns.get_loc('rank_type')] = 'Bottom 10'
+        st.plotly_chart(px.bar(df_sorted_inf, x='country', y='inflation', color='rank_type', title='Macroeconomic Volatility Spikes'), use_container_width=True)
         
         st.plotly_chart(px.scatter(df_filtered, x="gdpp", y="total_fer", size="child_mort", color="segment", hover_name="country", title="Economic Capacity Output Framework vs Fertility Metrics"), use_container_width=True)
 
