@@ -98,13 +98,13 @@ with tab1:
                 ]
                 choices = ['High Risk Country', 'Developed Nation', 'Emerging Economy', 'High Inflation Risk', 'Health Critical', 'Low GDP Trap']
                 raw_data['segment'] = np.select(conditions, choices, default='Other')
-                upload_to_mysql(raw_data, 'country_data')                
+                                
                 #Feature engineering
                 raw_data['Development_Index'] = (raw_data['income'] + raw_data['gdpp'] + raw_data['life_expec']) / raw_data['child_mort']
                 raw_data['Trade_Balance'] = raw_data['exports'] - raw_data['imports']
                 raw_data['Health_Impact_Ratio'] = raw_data['health'] / raw_data['child_mort']
                 raw_data['Risk_flag'] = raw_data['segment'].isin(['High Risk Country', 'High Inflation Risk', 'Health Critical', 'Low GDP Trap']).astype(int)                
-                
+                upload_to_mysql(raw_data, 'country_data')
                 st.success("Database successfully synchronized!")
                 st.rerun()
             except Exception as e:
